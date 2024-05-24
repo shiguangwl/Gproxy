@@ -146,7 +146,7 @@ def replaceKeyword(value, upstream, proxyResponse):
         replace('$scheme', parse.scheme).
         # $host 替换为域名
         replace('$host', parse.netloc).
-        replace('$proxy', '/' + config_loader.global_proxy_path +  '/')
+        replace('$PROXY$', '/' + config_loader.global_proxy_path +  '/')
     )
     return replace_value
 
@@ -158,7 +158,7 @@ def postInjectHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> Proxy
     if 'text/html' in proxyResponse.headers['content_type'] and 'utf-8' in proxyResponse.headers[
         'content_type'].lower():
         # 注入js代码,在最顶部最先执行
-        inject_code = f"<script>{js_content}</script>"
+        inject_code = f"<script>{js_content.replace('#global_proxy_path#', config_loader.global_proxy_path)}</script>"
         proxyResponse.content = proxyResponse.content.replace('<head>', '<head>' + inject_code)
 
     return proxyResponse
@@ -222,7 +222,7 @@ def allSiteProxy(path):
         ],
         postHandlers=[
             postHandler,
-            postReplaceContentHandler,
+            # postReplaceContentHandler,
             # postInjectHandler
         ]
     )

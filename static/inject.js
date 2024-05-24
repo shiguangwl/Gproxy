@@ -8,7 +8,7 @@
     // Helper function to get the modified URL
     function getModifiedUrl(url) {
         const parsedUrl = new URL(url, location.origin);
-        return parsedUrl.origin === location.origin ? url : `${location.origin}/${config_loader.global_proxy_path}/${parsedUrl.href}`;
+        return parsedUrl.origin === location.origin ? url : `${location.origin}/#global_proxy_path#/${parsedUrl.href}`;
     }
 
     // Hook for fetch

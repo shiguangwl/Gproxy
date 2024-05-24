@@ -28,7 +28,7 @@
     },
     {
       "search": "https://media.porndudecdn.com",
-      "replace": "$proxyhttps://media.porndudecdn.com",
+      "replace": "$PROXY$https://media.porndudecdn.com",
       "matchType": 1,
       "urlMatch": null,
       "urlExclude": null,

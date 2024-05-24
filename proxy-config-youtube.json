@@ -1,0 +1,22 @@
+{
+  "base_upstream": "https://www.youtube.com",
+  "home_path" : "/",
+  "replace_list": [
+    {
+      "search": "$upstream",
+      "replace": "$custom_site",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+        "search": "https://i.ytimg.com",
+        "replace": "$PROXY$https://i.ytimg.com",
+        "matchType": 1,
+        "urlMatch": null,
+        "urlExclude": null,
+        "contentType": null
+    }
+  ]
+}
