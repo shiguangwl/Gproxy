@@ -1,0 +1,46 @@
+{
+  "base_upstream": "https://theporndude.com",
+  "home_path" : "/zh",
+  "replace_list": [
+    {
+      "search": "$upstream",
+      "replace": "$custom_site",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "//theporndude.com",
+      "replace": "$custom_site",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "https:\\/\\/theporndude.com",
+      "replace": "",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "https://media.porndudecdn.com",
+      "replace": "$proxyhttps://media.porndudecdn.com",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "src=\"//theporndude.com",
+      "replace": "src=\"",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    }
+  ]
+}
