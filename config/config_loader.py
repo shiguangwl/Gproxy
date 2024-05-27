@@ -1,8 +1,13 @@
-from entitys import Upstream, ReplaceItem
 import json
+import os
+
+from entitys import Upstream, ReplaceItem
+
 # 加载配置文件proxy-config.json
 # configObj = {}
-with open('proxy-config-youtube' + '.json', 'r') as file:
+
+configFile = 'proxy-config-youtube.json'
+with open(os.path.join(os.path.dirname(__file__), configFile), 'r') as file:
     configObj = json.load(file)
 
 # 上游网站的域名.

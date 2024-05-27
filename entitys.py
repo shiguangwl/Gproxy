@@ -1,8 +1,6 @@
 from urllib.parse import urlparse
 
-from pip._internal.utils.misc import enum
-
-import config_loader
+from config import config_loader
 
 
 class Upstream:
@@ -83,7 +81,7 @@ def requestProxyConvert(request) -> ProxyRequest:
     proxyRequest.site = parsed_url.scheme + '://' + parsed_url.netloc
     # http://192.168.0.6/proxy/https://www.youtube.com/watch/dddd?v=JGwWNGJdvx8  => /watch/dddd?v=JGwWNGJdvx8
     proxyRequest.host = parsed_url.netloc
-    proxyRequest.url_no_site = '/' + '/'.join(request.url.split('/'+config_loader.global_proxy_path+'/')[1].split('/')[3:])
+    proxyRequest.url_no_site = '/' + '/'.join(request.url.split('/' + config_loader.global_proxy_path + '/')[1].split('/')[3:])
     proxyRequest.method = request.method
     proxyRequest.headers = {key: value for key, value in request.headers}
     proxyRequest.cookies = request.cookies

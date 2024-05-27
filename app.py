@@ -1,12 +1,12 @@
 import re
-from typing import List, Tuple, Any
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse
+
 import requests
 from flask import Flask, request, Response, abort
 
-import config_loader
 from common.CustomLogger import logger
-from entitys import ReplaceItem, ProxyRequest, ProxyResponse, Upstream, requestBaseConvert, \
+from config import config_loader
+from entitys import ProxyRequest, ProxyResponse, Upstream, requestBaseConvert, \
     requestProxyConvert
 
 # 上游网站的域名.
@@ -56,7 +56,7 @@ def proxy_handler(
     except requests.exceptions.RequestException as e:
         # 打印日志抛出错误原因
         logger.error(f'未知错误URL: {upstream_url} 错误原因: {e}')
-        abort(500)
+        abort(500,description=f'because: {e}')
 
     if response.status_code >= 400:
         logger.warning(f'请求响应异常URL: {upstream_url} HTTP状态码: {response.status_code}')
@@ -108,6 +108,14 @@ def postReplaceContentHandler(upstream: Upstream, proxyResponse: ProxyResponse) 
     """
     替换响应内容的后置处理函数。
     """
+    # 如果不是html或js或css则不处理
+    if (proxyResponse.headers['content_type'] != '' and
+            'text/html' not in proxyResponse.headers['content_type'].lower() and
+            'application/javascript' not in proxyResponse.headers['content_type'].lower() and
+            'text/css' not in proxyResponse.headers['content_type'].lower() and
+            'application/json' not in proxyResponse.headers['content_type'].lower()):
+        return proxyResponse
+
     # 匹配的url
     url_no_site = proxyResponse.proxyRequest.url_no_site
     # 请求返回类型
@@ -130,7 +138,7 @@ def postReplaceContentHandler(upstream: Upstream, proxyResponse: ProxyResponse) 
         if replaceItem.matchType == 1:
             proxyResponse.content = proxyResponse.content.replace(search_value, replace_value)
         else:
-            proxyResponse.content = re.sub(search_value, replace_value, proxyResponse.content)
+            proxyResponse.content = re.sub(search_value, replace_value, proxyResponse.content, flags=re.DOTALL)
     return proxyResponse
 
 
@@ -146,7 +154,7 @@ def replaceKeyword(value, upstream, proxyResponse):
         replace('$scheme', parse.scheme).
         # $host 替换为域名
         replace('$host', parse.netloc).
-        replace('$PROXY$', '/' + config_loader.global_proxy_path +  '/')
+        replace('$PROXY/', '/' + config_loader.global_proxy_path + '/')
     )
     return replace_value
 
@@ -198,9 +206,9 @@ def proxy(path):
     return Response(proxyResponse.content, proxyResponse.status_code, proxyResponse.headers)
 
 
-@app.route(f'/{config_loader.global_proxy_path}/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+@app.route(f'/{config_loader.global_proxy_path}/<path:path>',
+           methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def allSiteProxy(path):
-
     # http://192.168.0.6/proxy/https://www.youtube.com/watch/dddd?v=JGwWNGJdvx8  => https://www.youtube.com
     upstream = Upstream('/'.join(request.url.split(f'/{config_loader.global_proxy_path}/')[1].split('/')[:3]))
     proxyRequest = requestProxyConvert(request)
@@ -239,14 +247,13 @@ def CustomHomePathHandler(path):
             proxyRequest.path = path
             proxyRequest.url_no_site = path
         return proxyRequest
-    return homeHandler
 
+    return homeHandler
 
 
 if __name__ == '__main__':
     # 关闭调试模式
-    app.debug = True
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000,debug=True)
 
 # TODO
 # 自动识别

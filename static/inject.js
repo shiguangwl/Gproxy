@@ -20,8 +20,28 @@
         if (typeof input === 'string') {
             return originalFetch(modifiedUrl, options);
         } else {
-            const modifiedRequest = new Request(modifiedUrl, { ...input, url: modifiedUrl });
-            return originalFetch(modifiedRequest, options);
+            // FIXME: This is a temporary fix for Google Drive videos
+            if (input.url.indexOf('googlevideo.com/videoplayback') !== -1) {
+                const modifiedRequest = new Request(modifiedUrl, { ...input, url: modifiedUrl });
+                return originalFetch(modifiedRequest, options);
+            }else{
+                const modifiedRequest = new Request(modifiedUrl, {
+                    ...options, // Ensure all options are included
+                    method: input.method, // Preserve the original method
+                    headers: input.headers, // Preserve the original headers
+                    body: input.body, // Preserve the original body
+                    credentials: input.credentials, // Preserve credentials if any
+                    cache: input.cache, // Preserve cache settings if any
+                    mode: input.mode, // Preserve mode if any
+                    redirect: input.redirect, // Preserve redirect settings if any
+                    referrer: input.referrer, // Preserve referrer if any
+                    referrerPolicy: input.referrerPolicy, // Preserve referrer policy if any
+                    integrity: input.integrity, // Preserve integrity if any
+                    keepalive: input.keepalive, // Preserve keepalive if any
+                    signal: input.signal // Preserve signal if any
+                });
+                return originalFetch(modifiedRequest);
+            }
         }
     };
 

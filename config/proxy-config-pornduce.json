@@ -1,0 +1,126 @@
+{
+  "base_upstream": "https://theporndude.com",
+  "home_path" : "/zh",
+  "replace_list": [
+    {
+      "search": "$upstream",
+      "replace": "$custom_site",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "//theporndude.com",
+      "replace": "$custom_site",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "https:\\/\\/theporndude.com",
+      "replace": "",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "https://media.porndudecdn.com",
+      "replace": "$PROXY/https://media.porndudecdn.com",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "src=\"//theporndude.com",
+      "replace": "src=\"",
+      "matchType": 1,
+      "urlMatch": null,
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<ul class=\"socials.+?ul>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<div id=\"top\" .+?<\\/div><\\/div>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<div class=\"lang\">.+?<\\/ul><\\/div>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<div class=\"copyright-message\">.+?<\\/footer>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<iframe.+?iframe>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<div class=\"bottom-block\">.+?<!-- end .bottom-block -->",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "<footer.+?footer>",
+      "replace": "",
+      "matchType": 2,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+        "search": "https://assets.tpdfiles.com",
+        "replace": "$PROXY/https://assets.tpdfiles.com",
+        "matchType": 1,
+        "urlMatch": "",
+        "urlExclude": null,
+        "contentType": null
+    },
+    {
+        "search": "https://iframe.porndudegirls.com/js/code.js",
+        "replace": "",
+        "matchType": 1,
+        "urlMatch": "",
+        "urlExclude": null,
+        "contentType": null
+    },
+    {
+        "search": "PornDude (zh)",
+        "replace": "首页",
+        "matchType": 1,
+        "urlMatch": "",
+        "urlExclude": null,
+        "contentType": null
+    }
+  ]
+}

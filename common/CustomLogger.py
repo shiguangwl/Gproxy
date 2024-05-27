@@ -1,4 +1,6 @@
 import logging
+import os
+
 
 class CustomLogger:
     def __init__(self, log_file_path, console_level=logging.INFO, file_level=logging.INFO):
@@ -33,7 +35,7 @@ class CustomLogger:
         self.logger.error(message)
 
 
-log_file_path = "app.log"
+log_file_path = os.path.join(os.path.dirname(__file__), '../logs/app.log')
 logger = CustomLogger(log_file_path, console_level=logging.ERROR, file_level=logging.INFO)
 
 
