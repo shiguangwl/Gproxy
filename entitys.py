@@ -14,6 +14,14 @@ class Upstream:
         self.path = parsed_url.path
         # 域名
         self.host = parsed_url.netloc
+        # 顶级域名
+        splits = self.host.split(".")
+        if len(splits) > 2:
+            self.host_top = '.'.join(splits[-2:])
+        else:
+            self.host_top = self.host
+
+
 
 
 class ReplaceItem:
@@ -57,6 +65,8 @@ class ProxyRequest:
     path = None
     # 请求数据
     data = None
+    # 顶级域名
+    host_top = None
 
 
 # 处理基本请求的转换
@@ -71,6 +81,12 @@ def requestBaseConvert(request) -> ProxyRequest:
     proxyRequest.cookies = request.cookies
     proxyRequest.path = request.path
     proxyRequest.data = request.get_data()
+    splits = proxyRequest.host.split(".")
+    if len(splits) > 2:
+        proxyRequest.host_top = '.'.join(splits[-2:])
+    else:
+        proxyRequest.host_top = proxyRequest.host
+
     return proxyRequest
 
 
@@ -87,7 +103,11 @@ def requestProxyConvert(request) -> ProxyRequest:
     proxyRequest.cookies = request.cookies
     proxyRequest.path = proxyRequest.url_no_site.split('?')[0]
     proxyRequest.data = request.get_data()
-
+    splits = proxyRequest.host.split(".")
+    if len(splits) > 2:
+        proxyRequest.host_top = '.'.join(splits[-2:])
+    else:
+        proxyRequest.host_top = proxyRequest.host
     return proxyRequest
 
 

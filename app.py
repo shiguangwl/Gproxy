@@ -45,6 +45,7 @@ def proxy_handler(
     upstream_url = upstream.site + requestInfo.url_no_site
     # 向上游服务器发送请求并接收响应
     try:
+        # 开始请求数据
         response = requests.request(
             method=requestInfo.method,
             url=upstream_url,
@@ -73,14 +74,25 @@ def preHandler(upstream: Upstream, proxyRequest: ProxyRequest) -> ProxyRequest:
     """
     处理请求头的前置处理函数，替换必要请求头信息。
     """
-    if 'Host' in proxyRequest.headers.keys():
-        proxyRequest.headers['Host'] = upstream.host
-    if 'Referer' in proxyRequest.headers.keys():
-        proxyRequest.headers['Referer'] = proxyRequest.headers['Referer'].replace(proxyRequest.site, upstream.site)
-    if 'Origin' in proxyRequest.headers.keys():
-        proxyRequest.headers['Origin'] = proxyRequest.headers['Origin'].replace(proxyRequest.site, upstream.site)
+    # 小写化所有请求头键
+    lowercase_headers = {key.lower(): value for key, value in proxyRequest.headers.items()}
 
+    if 'host' in lowercase_headers:
+        lowercase_headers['host'] = upstream.host
+    if 'referer' in lowercase_headers:
+        lowercase_headers['referer'] = lowercase_headers['referer'].replace(proxyRequest.site, upstream.site)
+    if 'origin' in lowercase_headers:
+        lowercase_headers['origin'] = lowercase_headers['origin'].replace(proxyRequest.site, upstream.site)
+
+    # 如果请求体类型为json替换域名
+    # if 'content-type' in lowercase_headers and 'application/json' in lowercase_headers['content-type']:
+    #     proxyRequest.data = proxyRequest.data.replace(proxyRequest.site, upstream.site)
+    # 临时设置一个指定cookie
+    # if 'cookie' in lowercase_headers:
+    #     lowercase_headers['cookie'] = lowercase_headers['cookie'].replace('cookie', 'VISITOR_INFO1_LIVE=Plq0ZBNk7Sw; VISITOR_PRIVACY_METADATA=CgJTRxIEGgAgMQ%3D%3D; PREF=f4=4000000&tz=Asia.Shanghai; YSC=vQZNLVh0H9M')
+    proxyRequest.headers = lowercase_headers
     return proxyRequest
+
 
 
 def postHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> ProxyResponse:
@@ -88,18 +100,33 @@ def postHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> ProxyRespon
     处理响应的后置处理函数，替换必要响应信息。
     """
 
-    excluded_headers = ['content-encoding', 'transfer-encoding', 'content-length', 'connection']
-    # 移除不必要的头信息
-    headers = {name: value for name, value in proxyResponse.headers.items() if name.lower() not in excluded_headers}
-    headers['access-control-allow-origin'] = '*'
-    headers['access-control-allow-credentials'] = 'true'
-    headers['content_type'] = proxyResponse.headers.get('content-type', '')
-    # 替换当前域名的从定向
-    if proxyResponse.is_redirect:
-        location = proxyResponse.headers.get('Location', '')
-        location = location.replace(upstream.site, proxyResponse.proxyRequest.site)
-        headers['Location'] = location
+    # 将header的键名转换为小写并移除不必要的头信息
+    excluded_headers = {'content-encoding', 'transfer-encoding', 'content-length', 'connection'}
+    headers = [(key.lower(), value) for key, value in proxyResponse.headers.items() if
+               key.lower() not in excluded_headers]
 
+    # 添加和修改必要的头信息
+    headers.append(('access-control-allow-origin', '*'))
+    headers.append(('access-control-allow-credentials', 'true'))
+
+    # 默认content-type
+    content_type = next((value for name, value in headers if name == 'content-type'), '')
+    if content_type:
+        headers = [(name, value) if name != 'content-type' else ('content-type', content_type) for name, value in
+                   headers]
+
+    # 替换当前域名的重定向
+    if proxyResponse.is_redirect:
+        location = next((value for name, value in proxyResponse.headers.items() if name.lower() == 'location'), '')
+        if location:
+            location = location.replace(upstream.site, proxyResponse.proxyRequest.site)
+            headers.append(('location', location))
+
+    # 替换cookie域
+    headers = [(name, re.sub(r'Domain=[^;]+;', '', value)) if name == 'set-cookie' else (name, value) for name, value in
+               headers]
+
+    # 重新设置proxyResponse的headers
     proxyResponse.headers = headers
     return proxyResponse
 
@@ -109,17 +136,20 @@ def postReplaceContentHandler(upstream: Upstream, proxyResponse: ProxyResponse) 
     替换响应内容的后置处理函数。
     """
     # 如果不是html或js或css则不处理
-    if (proxyResponse.headers['content_type'] != '' and
-            'text/html' not in proxyResponse.headers['content_type'].lower() and
-            'application/javascript' not in proxyResponse.headers['content_type'].lower() and
-            'text/css' not in proxyResponse.headers['content_type'].lower() and
-            'application/json' not in proxyResponse.headers['content_type'].lower()):
+    # 判断是否存在 content-type
+
+    # proxyResponse.headers类型为  [(key,value)] key可能重复如存在多个set-cookie
+    # content-type 为text/html application/javascript text/css application/json 才替换内容
+    content_type = next((value for name, value in proxyResponse.headers if name == 'content-type'), '')
+    if ('text/html' not in content_type and
+            'application/javascript' not in content_type and
+            'text/css' not in content_type and
+            'application/json' not in content_type and content_type != ''):
         return proxyResponse
 
     # 匹配的url
     url_no_site = proxyResponse.proxyRequest.url_no_site
     # 请求返回类型
-    content_type = proxyResponse.headers.get('content-type', '')
     for replaceItem in replace_list:
         # 先匹配URL，如果urlMatch和urlExclude都不匹配则继续
         if replaceItem.urlMatch is not None and re.match(replaceItem.urlMatch, url_no_site) is None:
@@ -163,8 +193,8 @@ def postInjectHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> Proxy
     """
     注入js代码的后置处理函数。
     """
-    if 'text/html' in proxyResponse.headers['content_type'] and 'utf-8' in proxyResponse.headers[
-        'content_type'].lower():
+    content_type = next((value for name, value in proxyResponse.headers if name == 'content-type'), '').lower()
+    if 'text/html' in content_type and 'utf-8' in content_type:
         # 注入js代码,在最顶部最先执行
         inject_code = f"<script>{js_content.replace('#global_proxy_path#', config_loader.global_proxy_path)}</script>"
         proxyResponse.content = proxyResponse.content.replace('<head>', '<head>' + inject_code)
@@ -251,13 +281,12 @@ def CustomHomePathHandler(path):
     return homeHandler
 
 
-if __name__ == '__main__':
-    # 关闭调试模式
-    app.run(host='0.0.0.0', port=5000,debug=True)
-
 # TODO
 # 自动识别
 # 缓存处理
 
 # Complete
 # ajax拦截替换注入
+if __name__ == '__main__':
+    # 关闭调试模式
+    app.run(host='0.0.0.0', port=8000, debug=True)
