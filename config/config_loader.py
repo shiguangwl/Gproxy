@@ -6,8 +6,8 @@ from entitys import Upstream, ReplaceItem
 # 加载配置文件proxy-config.json
 # configObj = {}
 
-# configFile = 'proxy-config-pornduce.json'
-configFile = 'proxy-config-youtube.json'
+configFile = 'proxy-config-pornduce.json'
+# configFile = 'proxy-config-youtube.json'
 with open(os.path.join(os.path.dirname(__file__), configFile), 'r') as file:
     configObj = json.load(file)
 

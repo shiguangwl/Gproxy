@@ -3,6 +3,22 @@
   "home_path" : "/zh",
   "replace_list": [
     {
+      "search": "https://media.porndudecdn.com/includes/images/logo-r.svg",
+      "replace": "/static/logo-r.png",
+      "matchType": 1,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
+      "search": "https://media.porndudecdn.com/includes/images/logos/theporndude-zh.svg",
+      "replace": "/static/zgroup.ai.svg",
+      "matchType": 1,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
       "search": "$upstream",
       "replace": "$custom_site",
       "matchType": 1,

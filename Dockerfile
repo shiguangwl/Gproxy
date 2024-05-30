@@ -6,7 +6,7 @@ LABEL maintainer="TimeHo"
 WORKDIR /Gproxy
 COPY . /Gproxy
 # 使用无缓存模式安装依赖，减少镜像体积
-RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
+RUN pip install --no-cache-dir -r requirements.txt
 # 暴露应用端口
 EXPOSE 5000
 # 设置容器启动时运行的命令

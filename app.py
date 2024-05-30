@@ -60,7 +60,7 @@ def proxy_handler(
         abort(500,description=f'because: {e}')
 
     if response.status_code >= 400:
-        logger.warning(f'请求响应异常URL: {upstream_url} HTTP状态码: {response.status_code}')
+        logger.warning(f'HTTP状态码: {response.status_code}  请求响应异常URL: {upstream_url}')
         abort(response.status_code)
     proxyResponse = ProxyResponse(response)
     proxyResponse.proxyRequest = requestInfo
