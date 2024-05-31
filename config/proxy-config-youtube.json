@@ -1,6 +1,7 @@
 {
   "base_upstream": "https://www.youtube.com",
   "home_path" : "/",
+  "deny_request" : [],
   "replace_list": [
     {
       "search": "$upstream",

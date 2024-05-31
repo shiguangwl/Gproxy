@@ -6,6 +6,7 @@ from flask import Flask, request, Response, abort
 
 from common.CustomLogger import logger
 from config import config_loader
+from config.config_loader import deny_request_list
 from entitys import ProxyRequest, ProxyResponse, Upstream, requestBaseConvert, \
     requestProxyConvert
 
@@ -35,6 +36,13 @@ def proxy_handler(
     返回值:
     - ProxyResponse对象，包含从上游服务器收到的响应信息。
     """
+    upstream_url = upstream.site + requestInfo.url_no_site
+
+    # 拒绝列表
+    for denyRequest in deny_request_list:
+        if re.match(denyRequest, requestInfo.url_no_site) is not None:
+            abort(204, description='Access denied')
+
     # 执行前置处理函数
     if postHandlers is None:
         postHandlers = []
@@ -42,7 +50,6 @@ def proxy_handler(
         preHandlers = []
     for requestHandler in (preHandlers or []):
         requestInfo = requestHandler(upstream, requestInfo)
-    upstream_url = upstream.site + requestInfo.url_no_site
     # 向上游服务器发送请求并接收响应
     try:
         # 开始请求数据
