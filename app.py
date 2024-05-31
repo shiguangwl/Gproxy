@@ -184,7 +184,7 @@ def replaceKeyword(value, upstream, proxyResponse):
         replace('$scheme', parse.scheme).
         # $host 替换为域名
         replace('$host', parse.netloc).
-        replace('$PROXY/', '/' + config_loader.global_proxy_path + '/')
+        replace('$PROXY', '/' + config_loader.global_proxy_path)
     )
     return replace_value
 

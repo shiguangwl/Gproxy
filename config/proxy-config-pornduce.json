@@ -19,6 +19,14 @@
       "contentType": null
     },
     {
+      "search": "<title>Porn Dude – ",
+      "replace": "<title>zgroup.ai – ",
+      "matchType": 1,
+      "urlMatch": "",
+      "urlExclude": null,
+      "contentType": null
+    },
+    {
       "search": "$upstream",
       "replace": "$custom_site",
       "matchType": 1,
