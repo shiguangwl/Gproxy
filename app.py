@@ -36,13 +36,6 @@ def proxy_handler(
     返回值:
     - ProxyResponse对象，包含从上游服务器收到的响应信息。
     """
-    upstream_url = upstream.site + requestInfo.url_no_site
-
-    # 拒绝列表
-    for denyRequest in deny_request_list:
-        if re.match(denyRequest, requestInfo.url_no_site) is not None:
-            abort(204, description='Access denied')
-
     # 执行前置处理函数
     if postHandlers is None:
         postHandlers = []
@@ -50,6 +43,12 @@ def proxy_handler(
         preHandlers = []
     for requestHandler in (preHandlers or []):
         requestInfo = requestHandler(upstream, requestInfo)
+
+    upstream_url = upstream.site + requestInfo.url_no_site
+    # 拒绝列表
+    for denyRequest in deny_request_list:
+        if re.match(denyRequest, requestInfo.url_no_site) is not None:
+            abort(204, description='Access denied')
     # 向上游服务器发送请求并接收响应
     try:
         # 开始请求数据
@@ -130,12 +129,22 @@ def postHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> ProxyRespon
             headers.append(('location', location))
 
     # 替换cookie域
-    headers = [(name, re.sub(r'[d|D]omain=.+?;', '', value)) if (name == 'set-cookie') else (name, value) for name, value in
-               headers]
+    headers = clean_cookie_headers(headers)
     # 重新设置proxyResponse的headers
     proxyResponse.headers = headers
     return proxyResponse
-
+def clean_cookie_headers(headers):
+    cleaned_headers = []
+    for name, value in headers:
+        if name.lower() == 'set-cookie':
+            # Remove 'domain' attribute
+            value = re.sub(r'[d|D]omain=[^;]*;?', '', value)
+            # Remove 'secure' attribute
+            value = value.replace('secure;', '')
+            # Remove 'SameSite=None' attribute
+            value = value.replace('SameSite=None', '')
+        cleaned_headers.append((name, value))
+    return cleaned_headers
 
 def postReplaceContentHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> ProxyResponse:
     """

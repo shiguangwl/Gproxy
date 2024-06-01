@@ -8,8 +8,8 @@ from entitys import Upstream, ReplaceItem
 
 # configFile = 'proxy-config-xvideos.json'
 # configFile = 'proxy-config-pornduce.json'
-configFile = 'proxy-config-pornhub.json'
-# configFile = 'proxy-config-xhamster.json'
+# configFile = 'proxy-config-pornhub.json'
+configFile = 'proxy-config-xhamster.json'
 # configFile = 'proxy-config-youtube.json'
 with open(os.path.join(os.path.dirname(__file__), configFile), 'r') as file:
     configObj = json.load(file)
