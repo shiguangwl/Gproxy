@@ -130,9 +130,8 @@ def postHandler(upstream: Upstream, proxyResponse: ProxyResponse) -> ProxyRespon
             headers.append(('location', location))
 
     # 替换cookie域
-    headers = [(name, re.sub(r'Domain=[^;]+;', '', value)) if name == 'set-cookie' else (name, value) for name, value in
+    headers = [(name, re.sub(r'[d|D]omain=.+?;', '', value)) if (name == 'set-cookie') else (name, value) for name, value in
                headers]
-
     # 重新设置proxyResponse的headers
     proxyResponse.headers = headers
     return proxyResponse
